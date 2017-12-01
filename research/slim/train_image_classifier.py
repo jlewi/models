@@ -593,9 +593,9 @@ def main(_):
         FLAGS.num_ps_tasks, num_ps))
 
     num_workers = len(cluster.get('worker', []))
-    if num_workers != FLAGS.num_worker_replicas:
-      raise ValueError("--num_work_replicas={0} but TF_CONFIG specifies {1} workers".format(
-        FLAGS.num_worker_replicas, num_workers))
+    if num_workers != FLAGS.worker_replicas:
+      raise ValueError("--worker_replicas={0} but TF_CONFIG specifies {1} workers".format(
+        FLAGS.worker_replicas, num_workers))
 
     cluster_spec = tf.train.ClusterSpec(cluster)
     server = tf.train.Server(

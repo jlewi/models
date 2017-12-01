@@ -601,7 +601,13 @@ def main(_):
     server = tf.train.Server(
         cluster_spec, job_name=job_name, task_index=task_index)
 
-    if job_name == 'ps':
+    if job_name == 'ps' or job_name == "master":
+      # TODO(jlewi): The slim module wasn't written with a concept of
+      # a master. If we introduce a master and start running ops on
+      # the master it will mess things up. So to avoid this and still
+      # satisfy the requirement of TfJob to have a master we just start
+      # a gRPC server that will run forever.
+      tf.logging.info('Running a TensorFlow server')
       server.join()
       return
     # TODO(jlewi): I don't think we need a device_setter anymore
@@ -617,7 +623,8 @@ def main(_):
     ###########################
     # Kicks off the training. #
     ###########################
-    is_chief = job_name == 'master'
+    is_chief = task_index == 0
+    tf.logging.info("is chief: %s", is_chief)
     slim.learning.train(
         train_tensor,
         logdir=FLAGS.train_dir,
